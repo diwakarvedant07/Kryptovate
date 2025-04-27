@@ -1,0 +1,252 @@
+basePath: /
+definitions:
+  handlers.CreateCustomerRequest:
+    description: Request body for creating a new customer
+    properties:
+      balance:
+        example: 100.5
+        type: number
+      name:
+        example: John Doe
+        type: string
+    required:
+    - name
+    type: object
+  handlers.CreateTransactionRequest:
+    description: Request body for creating a new transaction
+    properties:
+      amount:
+        example: 100
+        type: number
+      customer_id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      type:
+        enum:
+        - credit
+        - debit
+        example: credit
+        type: string
+    required:
+    - amount
+    - customer_id
+    - type
+    type: object
+  models.BalanceResponse:
+    properties:
+      balance:
+        example: 100.5
+        type: number
+      customer_id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+    type: object
+  models.Customer:
+    description: Customer represents a financial account that can hold balance and
+      perform transactions
+    properties:
+      balance:
+        example: 1000
+        type: number
+      customer_id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      name:
+        example: John Doe
+        type: string
+    type: object
+  models.ErrorResponse:
+    properties:
+      error:
+        example: Error message
+        type: string
+    type: object
+  models.Transaction:
+    description: Transaction represents a credit or debit operation on a customer's
+      account
+    properties:
+      amount:
+        example: 100
+        type: number
+      customer_id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      timestamp:
+        example: "2025-04-06T10:45:00Z"
+        type: string
+      transaction_id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      type:
+        example: credit
+        type: string
+    type: object
+  models.TransactionResponse:
+    properties:
+      message:
+        example: Transaction queued successfully
+        type: string
+      transaction:
+        properties:
+          amount:
+            example: 100
+            type: number
+          customer_id:
+            example: 123e4567-e89b-12d3-a456-426614174000
+            type: string
+          timestamp:
+            example: "2025-04-27T11:03:15Z"
+            type: string
+          transaction_id:
+            example: 123e4567-e89b-12d3-a456-426614174000
+            type: string
+          type:
+            example: credit
+            type: string
+        type: object
+    type: object
+host: localhost:3005
+info:
+  contact:
+    email: dev@kryptovate.com
+    name: DEV TEAM
+  description: This is a ledger service API for managing customers and transactions
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Ledger Service API
+  version: "1.0"
+paths:
+  /customers:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new customer with an optional initial balance (defaults
+        to 0)
+      parameters:
+      - description: Customer details
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateCustomerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Customer created successfully
+          schema:
+            $ref: '#/definitions/models.Customer'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create a new customer
+      tags:
+      - customers
+  /customers/{customer_id}/balance:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the current balance of a customer
+      parameters:
+      - description: Customer ID
+        in: path
+        name: customer_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Customer balance retrieved successfully
+          schema:
+            $ref: '#/definitions/models.BalanceResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Customer not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get customer balance
+      tags:
+      - customers
+  /customers/{customer_id}/transactions:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the transaction history for a customer
+      parameters:
+      - description: Customer ID
+        in: path
+        name: customer_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction history retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/models.Transaction'
+            type: array
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Customer not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get transaction history
+      tags:
+      - customers
+  /transactions:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new transaction for a customer and queues it for processing
+      parameters:
+      - description: Transaction details
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction queued successfully
+          schema:
+            $ref: '#/definitions/models.TransactionResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create a new transaction
+      tags:
+      - transactions
+schemes:
+- http
+swagger: "2.0"
