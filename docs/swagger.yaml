@@ -56,6 +56,38 @@ definitions:
         example: Error message
         type: string
     type: object
+  models.Transaction:
+    description: Transaction represents a credit or debit operation on a customer's
+      account
+    properties:
+      amount:
+        example: 100
+        type: number
+      customer_id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      timestamp:
+        example: "2025-04-06T10:45:00Z"
+        type: string
+      transaction_id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      type:
+        example: credit
+        type: string
+    type: object
+  models.TransactionStatusResponse:
+    properties:
+      balance:
+        example: 100.5
+        type: number
+      status:
+        example: completed
+        type: string
+      transaction_id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+    type: object
 host: localhost:3005
 info:
   contact:
@@ -168,6 +200,40 @@ paths:
       summary: Get transaction history
       tags:
       - customers
+  /transactions:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new credit or debit transaction for a customer
+      parameters:
+      - description: Transaction details
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/models.Transaction'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction processed successfully
+          schema:
+            $ref: '#/definitions/models.TransactionStatusResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Customer not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create a new transaction
+      tags:
+      - transactions
 schemes:
 - http
 swagger: "2.0"

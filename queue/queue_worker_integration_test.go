@@ -57,9 +57,11 @@ func TestQueueAndWorkerIntegration(t *testing.T) {
 	customers, transactions := setupTestDB(t)
 	queue := NewTransactionQueue()
 
+	customerID := models.GenerateCustomerID()
+
 	// Create a test customer
 	customer := models.Customer{
-		CustomerID: "test_customer",
+		CustomerID: customerID,
 		Name:      "Test Customer",
 		Balance:   1000,
 	}
@@ -69,14 +71,14 @@ func TestQueueAndWorkerIntegration(t *testing.T) {
 	}
 
 	// Create a worker
-	worker := NewWorker("test_customer", queue, customers, transactions)
+	worker := NewWorker(customerID, queue, customers, transactions)
 	worker.Start()
 	defer worker.Stop()
 
 	// Test credit transaction
 	creditTx := models.Transaction{
 		TransactionID: models.GenerateTransactionID(),
-		CustomerID:    "test_customer",
+		CustomerID:    customerID,
 		Type:         "credit",
 		Amount:       100,
 		Timestamp:    time.Now(),
@@ -100,7 +102,7 @@ func TestQueueAndWorkerIntegration(t *testing.T) {
 	// Test debit transaction
 	debitTx := models.Transaction{
 		TransactionID: models.GenerateTransactionID(),
-		CustomerID:    "test_customer",
+		CustomerID:    customerID,
 		Type:         "debit",
 		Amount:       50,
 		Timestamp:    time.Now(),
@@ -124,7 +126,7 @@ func TestQueueAndWorkerIntegration(t *testing.T) {
 	// Test insufficient funds
 	insufficientTx := models.Transaction{
 		TransactionID: models.GenerateTransactionID(),
-		CustomerID:    "test_customer",
+		CustomerID:    customerID,
 		Type:         "debit",
 		Amount:       2000,
 		Timestamp:    time.Now(),
@@ -144,7 +146,7 @@ func TestQueueAndWorkerIntegration(t *testing.T) {
 
 	// Verify final balance
 	var updatedCustomer models.Customer
-	err = customers.FindOne(context.Background(), bson.M{"_id": "test_customer"}).Decode(&updatedCustomer)
+	err = customers.FindOne(context.Background(), bson.M{"_id": customerID}).Decode(&updatedCustomer)
 	if err != nil {
 		t.Fatalf("Failed to get updated customer: %v", err)
 	}
@@ -153,7 +155,7 @@ func TestQueueAndWorkerIntegration(t *testing.T) {
 	}
 
 	// Verify transaction history
-	cursor, err := transactions.Find(context.Background(), bson.M{"customer_id": "test_customer"})
+	cursor, err := transactions.Find(context.Background(), bson.M{"customer_id": customerID})
 	if err != nil {
 		t.Fatalf("Failed to get transactions: %v", err)
 	}

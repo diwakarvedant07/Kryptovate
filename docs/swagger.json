@@ -168,6 +168,58 @@
                     }
                 }
             }
+        },
+        "/transactions": {
+            "post": {
+                "description": "Creates a new credit or debit transaction for a customer",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Create a new transaction",
+                "parameters": [
+                    {
+                        "description": "Transaction details",
+                        "name": "transaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Transaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transaction processed successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.TransactionStatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Customer not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -246,6 +298,49 @@
                 "error": {
                     "type": "string",
                     "example": "Error message"
+                }
+            }
+        },
+        "models.Transaction": {
+            "description": "Transaction represents a credit or debit operation on a customer's account",
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "example": 100
+                },
+                "customer_id": {
+                    "type": "string",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "example": "2025-04-06T10:45:00Z"
+                },
+                "transaction_id": {
+                    "type": "string",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "credit"
+                }
+            }
+        },
+        "models.TransactionStatusResponse": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "number",
+                    "example": 100.5
+                },
+                "status": {
+                    "type": "string",
+                    "example": "completed"
+                },
+                "transaction_id": {
+                    "type": "string",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
                 }
             }
         }

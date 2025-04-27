@@ -31,6 +31,17 @@ func NewTransactionHandler(
 }
 
 // CreateTransaction handles the creation of a new transaction
+// @Summary Create a new transaction
+// @Description Creates a new credit or debit transaction for a customer
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Param transaction body models.Transaction true "Transaction details"
+// @Success 200 {object} models.TransactionStatusResponse "Transaction processed successfully"
+// @Failure 400 {object} models.ErrorResponse "Invalid request"
+// @Failure 404 {object} models.ErrorResponse "Customer not found"
+// @Failure 500 {object} models.ErrorResponse "Internal server error"
+// @Router /transactions [post]
 func (h *TransactionHandler) CreateTransaction(c *fiber.Ctx) error {
 	var transaction models.Transaction
 	if err := c.BodyParser(&transaction); err != nil {
