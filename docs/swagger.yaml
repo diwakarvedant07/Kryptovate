@@ -12,25 +12,20 @@ definitions:
     required:
     - name
     type: object
-  handlers.CreateTransactionRequest:
-    description: Request body for creating a new transaction
+  handlers.TransactionHistoryResponse:
     properties:
       amount:
         example: 100
         type: number
-      customer_id:
+      timestamp:
+        example: "2025-04-27T11:03:15Z"
+        type: string
+      transaction_id:
         example: 123e4567-e89b-12d3-a456-426614174000
         type: string
       type:
-        enum:
-        - credit
-        - debit
         example: credit
         type: string
-    required:
-    - amount
-    - customer_id
-    - type
     type: object
   models.BalanceResponse:
     properties:
@@ -60,50 +55,6 @@ definitions:
       error:
         example: Error message
         type: string
-    type: object
-  models.Transaction:
-    description: Transaction represents a credit or debit operation on a customer's
-      account
-    properties:
-      amount:
-        example: 100
-        type: number
-      customer_id:
-        example: 123e4567-e89b-12d3-a456-426614174000
-        type: string
-      timestamp:
-        example: "2025-04-06T10:45:00Z"
-        type: string
-      transaction_id:
-        example: 123e4567-e89b-12d3-a456-426614174000
-        type: string
-      type:
-        example: credit
-        type: string
-    type: object
-  models.TransactionResponse:
-    properties:
-      message:
-        example: Transaction queued successfully
-        type: string
-      transaction:
-        properties:
-          amount:
-            example: 100
-            type: number
-          customer_id:
-            example: 123e4567-e89b-12d3-a456-426614174000
-            type: string
-          timestamp:
-            example: "2025-04-27T11:03:15Z"
-            type: string
-          transaction_id:
-            example: 123e4567-e89b-12d3-a456-426614174000
-            type: string
-          type:
-            example: credit
-            type: string
-        type: object
     type: object
 host: localhost:3005
 info:
@@ -200,7 +151,7 @@ paths:
           description: Transaction history retrieved successfully
           schema:
             items:
-              $ref: '#/definitions/models.Transaction'
+              $ref: '#/definitions/handlers.TransactionHistoryResponse'
             type: array
         "400":
           description: Invalid request
@@ -217,36 +168,6 @@ paths:
       summary: Get transaction history
       tags:
       - customers
-  /transactions:
-    post:
-      consumes:
-      - application/json
-      description: Creates a new transaction for a customer and queues it for processing
-      parameters:
-      - description: Transaction details
-        in: body
-        name: transaction
-        required: true
-        schema:
-          $ref: '#/definitions/handlers.CreateTransactionRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Transaction queued successfully
-          schema:
-            $ref: '#/definitions/models.TransactionResponse'
-        "400":
-          description: Invalid request
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
-      summary: Create a new transaction
-      tags:
-      - transactions
 schemes:
 - http
 swagger: "2.0"

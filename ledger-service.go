@@ -64,8 +64,11 @@ func main() {
 	customersHandler := handlers.NewCustomerHandler(customersCollection, transactionsCollection)
 	transactionsHandler := handlers.NewTransactionHandler(transactionQueue, customersCollection, transactionsCollection)
 
-	// Swagger route
-	app.Get("/swagger/*", swagger.New())
+	// Swagger configuration
+	app.Get("/swagger/*", swagger.New(swagger.Config{
+		URL:         "/swagger/doc.json",
+		DeepLinking: true,
+	}))
 
 	// Register routes
 	customersHandler.RegisterRoutes(app)

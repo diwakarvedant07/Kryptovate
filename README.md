@@ -51,7 +51,8 @@ The service will start on `http://localhost:3005`
 The API documentation is available through Swagger UI at:
 
 ```
-http://localhost:3005/swagger/index.html
+LOCAL: http://localhost:3005/swagger/index.html
+LIVE:  http://43.204.217.119/LEDGER/swagger/index.html
 ```
 
 ### Endpoints
