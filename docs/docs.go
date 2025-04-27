@@ -147,7 +147,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Transaction"
+                                "$ref": "#/definitions/handlers.TransactionHistoryResponse"
                             }
                         }
                     },
@@ -159,52 +159,6 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Customer not found",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/transactions": {
-            "post": {
-                "description": "Creates a new transaction for a customer and queues it for processing",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "transactions"
-                ],
-                "summary": "Create a new transaction",
-                "parameters": [
-                    {
-                        "description": "Transaction details",
-                        "name": "transaction",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handlers.CreateTransactionRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Transaction queued successfully",
-                        "schema": {
-                            "$ref": "#/definitions/models.TransactionResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
@@ -237,29 +191,23 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.CreateTransactionRequest": {
-            "description": "Request body for creating a new transaction",
+        "handlers.TransactionHistoryResponse": {
             "type": "object",
-            "required": [
-                "amount",
-                "customer_id",
-                "type"
-            ],
             "properties": {
                 "amount": {
                     "type": "number",
                     "example": 100
                 },
-                "customer_id": {
+                "timestamp": {
+                    "type": "string",
+                    "example": "2025-04-27T11:03:15Z"
+                },
+                "transaction_id": {
                     "type": "string",
                     "example": "123e4567-e89b-12d3-a456-426614174000"
                 },
                 "type": {
                     "type": "string",
-                    "enum": [
-                        "credit",
-                        "debit"
-                    ],
                     "example": "credit"
                 }
             }
@@ -301,66 +249,6 @@ const docTemplate = `{
                 "error": {
                     "type": "string",
                     "example": "Error message"
-                }
-            }
-        },
-        "models.Transaction": {
-            "description": "Transaction represents a credit or debit operation on a customer's account",
-            "type": "object",
-            "properties": {
-                "amount": {
-                    "type": "number",
-                    "example": 100
-                },
-                "customer_id": {
-                    "type": "string",
-                    "example": "123e4567-e89b-12d3-a456-426614174000"
-                },
-                "timestamp": {
-                    "type": "string",
-                    "example": "2025-04-06T10:45:00Z"
-                },
-                "transaction_id": {
-                    "type": "string",
-                    "example": "123e4567-e89b-12d3-a456-426614174000"
-                },
-                "type": {
-                    "type": "string",
-                    "example": "credit"
-                }
-            }
-        },
-        "models.TransactionResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string",
-                    "example": "Transaction queued successfully"
-                },
-                "transaction": {
-                    "type": "object",
-                    "properties": {
-                        "amount": {
-                            "type": "number",
-                            "example": 100
-                        },
-                        "customer_id": {
-                            "type": "string",
-                            "example": "123e4567-e89b-12d3-a456-426614174000"
-                        },
-                        "timestamp": {
-                            "type": "string",
-                            "example": "2025-04-27T11:03:15Z"
-                        },
-                        "transaction_id": {
-                            "type": "string",
-                            "example": "123e4567-e89b-12d3-a456-426614174000"
-                        },
-                        "type": {
-                            "type": "string",
-                            "example": "credit"
-                        }
-                    }
                 }
             }
         }
