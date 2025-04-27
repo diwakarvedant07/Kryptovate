@@ -10,12 +10,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"github.com/joho/godotenv"
 	"log"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 
 	"ledger-service/handlers"
 	"ledger-service/queue"
 	_ "ledger-service/docs" // This is required for swagger
 
-	"github.com/gofiber/swagger"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
 )
 
 // @title           Ledger Service API
@@ -33,6 +34,11 @@ import (
 
 func main() {
 	app := fiber.New()
+	 app.Use(cors.New(cors.Config{
+			AllowOrigins: "*", // For testing, be more specific in production
+			AllowMethods: "GET,POST,PUT,DELETE",
+			AllowHeaders: "Origin, Content-Type, Accept",
+	}))
 	err := godotenv.Load()
 
 	if err != nil {
@@ -65,10 +71,12 @@ func main() {
 	transactionsHandler := handlers.NewTransactionHandler(transactionQueue, customersCollection, transactionsCollection)
 
 	// Swagger configuration
-	app.Get("/swagger/*", swagger.New(swagger.Config{
-		URL:         "/swagger/doc.json",
-		DeepLinking: true,
-	}))
+	// app.Get("/swagger/*", swagger.New(swagger.Config{
+	// 	URL:         "/swagger/doc.json",
+	// 	DeepLinking: true,
+	// }))
+
+	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 
 	// Register routes
 	customersHandler.RegisterRoutes(app)

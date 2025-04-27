@@ -50,16 +50,6 @@ func setupTestDB(t *testing.T) (*mongo.Collection, *mongo.Collection) {
 	customers := db.Collection("customers")
 	transactions := db.Collection("transactions")
 
-	// Clean up collections before tests
-	_, err = customers.DeleteMany(context.Background(), bson.M{})
-	if err != nil {
-		t.Fatalf("Failed to clean customers collection: %v", err)
-	}
-	_, err = transactions.DeleteMany(context.Background(), bson.M{})
-	if err != nil {
-		t.Fatalf("Failed to clean transactions collection: %v", err)
-	}
-
 	return customers, transactions
 }
 
