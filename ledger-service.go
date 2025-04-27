@@ -3,26 +3,33 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/gofiber/fiber/v2"
 	"os"
-	"time"
 
+	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"github.com/joho/godotenv"
 	"log"
+
+	"ledger-service/handlers"
+	"ledger-service/queue"
+	_ "ledger-service/docs" // This is required for swagger
+
+	"github.com/gofiber/swagger"
 )
 
-type Account struct {
-	ID      primitive.ObjectID `json:"id" bson:"_id"`
-	Name    string            `json:"name" bson:"name"`
-	Balance string            `json:"balance" bson:"balance"`
-}
+// @title           Ledger Service API
+// @version         1.0
+// @description     This is a ledger service API for managing customers and transactions
+// @termsOfService  http://swagger.io/terms/
+// @contact.name    DEV TEAM
+// @contact.email   dev@kryptovate.com
+// @license.name    Apache 2.0
+// @license.url     http://www.apache.org/licenses/LICENSE-2.0.html
 
-var client *mongo.Client
-var accountsCollection *mongo.Collection
+// @host      localhost:3005
+// @BasePath  /
+// @schemes   http
 
 func main() {
 	app := fiber.New()
@@ -35,20 +42,34 @@ func main() {
 	databaseURL := os.Getenv("MONGO_CLUSTER")
 
 	clientOptions := options.Client().ApplyURI(databaseURL)
-	client, err = mongo.Connect(context.Background(), clientOptions)
+	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// Test the connection
 	err = client.Ping(context.Background(), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Get the accounts collection
-	accountsCollection = client.Database("kryptovate").Collection("accounts")
+	// Get collections
+	customersCollection := client.Database("kryptovate").Collection("customers")
+	transactionsCollection := client.Database("kryptovate").Collection("transactions")
 
-	fmt.Println("Connected to MongoDB!")
+	// Initialize transaction queue
+	transactionQueue := queue.NewTransactionQueue()
+
+	// Initialize route handlers
+	customersHandler := handlers.NewCustomerHandler(customersCollection, transactionsCollection)
+	transactionsHandler := handlers.NewTransactionHandler(transactionQueue, customersCollection, transactionsCollection)
+
+	// Swagger route
+	app.Get("/swagger/*", swagger.New())
+
+	// Register routes
+	customersHandler.RegisterRoutes(app)
+	transactionsHandler.RegisterRoutes(app)
 
 	// Health Check Route
 	app.Get("/health", func(c *fiber.Ctx) error {
@@ -57,29 +78,6 @@ func main() {
 		})
 	})
 
-	// Get all accounts
-	app.Get("/accounts", func(c *fiber.Ctx) error {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-
-		cursor, err := accountsCollection.Find(ctx, bson.M{})
-		if err != nil {
-			return c.Status(500).JSON(fiber.Map{
-				"error": "Failed to fetch accounts",
-			})
-		}
-		defer cursor.Close(ctx)
-
-		var accounts []Account
-		if err = cursor.All(ctx, &accounts); err != nil {
-			return c.Status(500).JSON(fiber.Map{
-				"error": "Failed to decode accounts",
-			})
-		}
-
-		return c.JSON(accounts)
-	})
-
-	// Start server
+	fmt.Println("Connected to MongoDB!")
 	app.Listen(":3005")
 }
