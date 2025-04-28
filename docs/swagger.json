@@ -189,7 +189,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Transaction"
+                            "$ref": "#/definitions/handlers.CreateTransactionRequest"
                         }
                     }
                 ],
@@ -237,6 +237,23 @@
                 "name": {
                     "type": "string",
                     "example": "John Doe"
+                }
+            }
+        },
+        "handlers.CreateTransactionRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "example": 100
+                },
+                "customer_id": {
+                    "type": "string",
+                    "example": "ef48ae68-182f-4f2f-bb62-8a0016a9ca94"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "credit"
                 }
             }
         },
@@ -298,32 +315,6 @@
                 "error": {
                     "type": "string",
                     "example": "Error message"
-                }
-            }
-        },
-        "models.Transaction": {
-            "description": "Transaction represents a credit or debit operation on a customer's account",
-            "type": "object",
-            "properties": {
-                "amount": {
-                    "type": "number",
-                    "example": 100
-                },
-                "customer_id": {
-                    "type": "string",
-                    "example": "123e4567-e89b-12d3-a456-426614174000"
-                },
-                "timestamp": {
-                    "type": "string",
-                    "example": "2025-04-06T10:45:00Z"
-                },
-                "transaction_id": {
-                    "type": "string",
-                    "example": "123e4567-e89b-12d3-a456-426614174000"
-                },
-                "type": {
-                    "type": "string",
-                    "example": "credit"
                 }
             }
         },

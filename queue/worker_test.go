@@ -12,8 +12,8 @@ import (
 
 // mockCollection implements mongo.Collection interface for testing
 type mockCollection struct {
-	findOneResult interface{}
-	findOneErr    error
+	findOneResult   interface{}
+	findOneErr      error
 	updateOneResult *mongo.UpdateResult
 	updateOneErr    error
 	insertOneResult *mongo.InsertOneResult
@@ -101,9 +101,9 @@ func TestWorkerQueueOperations(t *testing.T) {
 	t1 := models.Transaction{
 		TransactionID: "test1",
 		CustomerID:    "test_customer",
-		Type:         "credit",
-		Amount:       100,
-		Timestamp:    time.Now(),
+		Type:          "credit",
+		Amount:        100,
+		Timestamp:     time.Now(),
 	}
 
 	queue.Enqueue(t1)
@@ -132,9 +132,9 @@ func TestWorkerLifecycle(t *testing.T) {
 	t1 := models.Transaction{
 		TransactionID: "test1",
 		CustomerID:    "test_customer",
-		Type:         "credit",
-		Amount:       100,
-		Timestamp:    time.Now(),
+		Type:          "credit",
+		Amount:        100,
+		Timestamp:     time.Now(),
 	}
 
 	queue.Enqueue(t1)
@@ -156,9 +156,9 @@ func TestWorkerTransactionValidation(t *testing.T) {
 	t1 := models.Transaction{
 		TransactionID: "test1",
 		CustomerID:    "test_customer",
-		Type:         "invalid",
-		Amount:       100,
-		Timestamp:    time.Now(),
+		Type:          "invalid",
+		Amount:        100,
+		Timestamp:     time.Now(),
 	}
 
 	queue.Enqueue(t1)
@@ -176,9 +176,9 @@ func TestWorkerTransactionValidation(t *testing.T) {
 	t2 := models.Transaction{
 		TransactionID: "test2",
 		CustomerID:    "test_customer",
-		Type:         "credit",
-		Amount:       -100,
-		Timestamp:    time.Now(),
+		Type:          "credit",
+		Amount:        -100,
+		Timestamp:     time.Now(),
 	}
 
 	queue.Enqueue(t2)
@@ -191,4 +191,4 @@ func TestWorkerTransactionValidation(t *testing.T) {
 	case <-time.After(1 * time.Second):
 		t.Error("Transaction processing timed out")
 	}
-} 
+}
