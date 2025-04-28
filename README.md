@@ -52,7 +52,7 @@ The API documentation is available through Swagger UI at:
 
 ```
 LOCAL: http://localhost:3005/swagger/index.html
-LIVE:  http://43.204.217.119/LEDGER/swagger/index.html
+LIVE:  https://43.204.217.119/LEDGER/swagger/index.html
 ```
 
 ### Endpoints
@@ -107,14 +107,14 @@ go test -v ./...
 The service is currently running at:
 
 ```
-http://43.204.217.119/LEDGER/
+https://43.204.217.119/LEDGER/
 
 ```
 
 Check service health
 
 ```
-http://43.204.217.119/LEDGER/health
+https://43.204.217.119/LEDGER/health
 
 ```
 
