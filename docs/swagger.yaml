@@ -12,6 +12,18 @@ definitions:
     required:
     - name
     type: object
+  handlers.CreateTransactionRequest:
+    properties:
+      amount:
+        example: 100
+        type: number
+      customer_id:
+        example: ef48ae68-182f-4f2f-bb62-8a0016a9ca94
+        type: string
+      type:
+        example: credit
+        type: string
+    type: object
   handlers.TransactionHistoryResponse:
     properties:
       amount:
@@ -54,26 +66,6 @@ definitions:
     properties:
       error:
         example: Error message
-        type: string
-    type: object
-  models.Transaction:
-    description: Transaction represents a credit or debit operation on a customer's
-      account
-    properties:
-      amount:
-        example: 100
-        type: number
-      customer_id:
-        example: 123e4567-e89b-12d3-a456-426614174000
-        type: string
-      timestamp:
-        example: "2025-04-06T10:45:00Z"
-        type: string
-      transaction_id:
-        example: 123e4567-e89b-12d3-a456-426614174000
-        type: string
-      type:
-        example: credit
         type: string
     type: object
   models.TransactionStatusResponse:
@@ -211,7 +203,7 @@ paths:
         name: transaction
         required: true
         schema:
-          $ref: '#/definitions/models.Transaction'
+          $ref: '#/definitions/handlers.CreateTransactionRequest'
       produces:
       - application/json
       responses:

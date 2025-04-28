@@ -12,14 +12,14 @@ import (
 
 // Worker processes transactions for a specific customer
 type Worker struct {
-	customerID            string
-	queue                *TransactionQueue
-	customersCollection  *mongo.Collection
+	customerID             string
+	queue                  *TransactionQueue
+	customersCollection    *mongo.Collection
 	transactionsCollection *mongo.Collection
-	stopChan             chan struct{}
-	completionChan       chan models.TransactionStatusResponse
-	mu                   sync.RWMutex
-	stopped              bool
+	stopChan               chan struct{}
+	completionChan         chan models.TransactionStatusResponse
+	mu                     sync.RWMutex
+	stopped                bool
 }
 
 // NewWorker creates a new worker for a specific customer
@@ -30,12 +30,12 @@ func NewWorker(
 	transactionsCollection *mongo.Collection,
 ) *Worker {
 	return &Worker{
-		customerID:            customerID,
-		queue:                queue,
-		customersCollection:  customersCollection,
+		customerID:             customerID,
+		queue:                  queue,
+		customersCollection:    customersCollection,
 		transactionsCollection: transactionsCollection,
-		stopChan:             make(chan struct{}),
-		completionChan:       make(chan models.TransactionStatusResponse, 100),
+		stopChan:               make(chan struct{}),
+		completionChan:         make(chan models.TransactionStatusResponse, 100),
 	}
 }
 
@@ -86,8 +86,8 @@ func (w *Worker) processTransaction(t models.Transaction) {
 	if w.customersCollection == nil || w.transactionsCollection == nil {
 		w.completionChan <- models.TransactionStatusResponse{
 			TransactionID: t.TransactionID,
-			Status:       "failed",
-			Balance:      0,
+			Status:        "failed",
+			Balance:       0,
 		}
 		return
 	}
@@ -96,8 +96,8 @@ func (w *Worker) processTransaction(t models.Transaction) {
 	if t.Type != "credit" && t.Type != "debit" {
 		w.completionChan <- models.TransactionStatusResponse{
 			TransactionID: t.TransactionID,
-			Status:       "failed",
-			Balance:      0,
+			Status:        "failed",
+			Balance:       0,
 		}
 		return
 	}
@@ -105,8 +105,8 @@ func (w *Worker) processTransaction(t models.Transaction) {
 	if t.Amount <= 0 {
 		w.completionChan <- models.TransactionStatusResponse{
 			TransactionID: t.TransactionID,
-			Status:       "failed",
-			Balance:      0,
+			Status:        "failed",
+			Balance:       0,
 		}
 		return
 	}
@@ -116,8 +116,8 @@ func (w *Worker) processTransaction(t models.Transaction) {
 	if err != nil {
 		w.completionChan <- models.TransactionStatusResponse{
 			TransactionID: t.TransactionID,
-			Status:       "failed",
-			Balance:      0,
+			Status:        "failed",
+			Balance:       0,
 		}
 		return
 	}
@@ -167,23 +167,23 @@ func (w *Worker) processTransaction(t models.Transaction) {
 		if err == models.ErrInsufficientFunds {
 			w.completionChan <- models.TransactionStatusResponse{
 				TransactionID: t.TransactionID,
-				Status:       "failed",
-				Balance:      0,
+				Status:        "failed",
+				Balance:       0,
 			}
 			return
 		}
 		w.queue.Enqueue(t)
 		w.completionChan <- models.TransactionStatusResponse{
 			TransactionID: t.TransactionID,
-			Status:       "failed",
-			Balance:      0,
+			Status:        "failed",
+			Balance:       0,
 		}
 		return
 	}
 
 	w.completionChan <- models.TransactionStatusResponse{
 		TransactionID: t.TransactionID,
-		Status:       "completed",
-		Balance:      updatedBalance,
+		Status:        "completed",
+		Balance:       updatedBalance,
 	}
-} 
+}

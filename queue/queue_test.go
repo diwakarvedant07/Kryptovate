@@ -18,9 +18,9 @@ func TestTransactionQueue(t *testing.T) {
 	t1 := models.Transaction{
 		TransactionID: "test1",
 		CustomerID:    "test_customer",
-		Type:         "credit",
-		Amount:       100,
-		Timestamp:    time.Now(),
+		Type:          "credit",
+		Amount:        100,
+		Timestamp:     time.Now(),
 	}
 
 	queue.Enqueue(t1)
@@ -51,9 +51,9 @@ func TestTransactionQueueConcurrent(t *testing.T) {
 			transaction := models.Transaction{
 				TransactionID: string(rune(i)),
 				CustomerID:    "test_customer",
-				Type:         "credit",
-				Amount:       10,
-				Timestamp:    time.Now(),
+				Type:          "credit",
+				Amount:        10,
+				Timestamp:     time.Now(),
 			}
 			queue.Enqueue(transaction)
 			done <- true
@@ -82,4 +82,4 @@ func TestTransactionQueueConcurrent(t *testing.T) {
 	if count != 10 {
 		t.Errorf("Expected 10 transactions, got %d", count)
 	}
-} 
+}
